@@ -1,0 +1,15 @@
+ls *.bpread.ident | while read f
+do
+  q=`echo "$f" | sed 's/.bpread.ident//' `
+  ## ls ../$q
+  ### tab in the following line
+  echo -n "$q   "
+  ### read length
+  len=`head ../$q | awk 'NR == 2 {print length($1);}' `
+  echo -n "$len "
+  ### 550th read (whole length mapped) blast identity; Assume > 550 reads mapped
+  iden=`sort -nr $f | awk 'NR == 550'`
+  echo -n "$iden        "
+  ### # of reads with whole length mapper, among 1000 randomly chosen reads
+  cat  $f | wc -l
+done
