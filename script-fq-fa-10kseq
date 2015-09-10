@@ -1,0 +1,28 @@
+#
+#
+for file in `head -1000  file-list_1.fq  `
+do
+awk '
+{
+ if( (NR - 1) % 20000 == 0)
+   print ">" $1;
+ else if( (NR - 2) % 20000 == 0)
+   print $0;
+ else;
+}
+ ' $file | head -2000 > $file.fasta
+ ### 1000 randomely chosen reads
+ echo $file
+ blastall -p blastn -d  ../rice-v7-all-chro-mito.blastall    -i  $file.fasta -a 4 -e 1e-15 -F F -S 3 -o out -m 9
+ grep "# Fields: Query id, Subject id," -A 1   out > out-top-hit
+ s=`echo "$file" | grep -i sanger | wc -l`
+ ### some fq files with 100-bp read; others have 101-bp read
+ ### whole read mapped; output identity
+ if [ $s -eq 1 ]
+ then
+   grep "^@"  out-top-hit | awk '$7 == 1 && $8 == 100 {print $3}' | sort -n > $file.bpread.ident
+ else
+   grep "^@"  out-top-hit | awk '$7 == 1 && $8 == 101 {print $3}' | sort -n > $file.bpread.ident
+ fi
+ rm $file.fasta
+done
