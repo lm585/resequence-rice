@@ -1,0 +1,26 @@
+###
+
+### for 150-bp read
+param="-n 6  -o 2 -e 2 "
+ref="/data/linyong/rice-v7-all-chro-mito.con"
+
+for fq in `cat file-list_1-no-sanger | head -1000`
+do
+  perl /home/linyong/BTI-apple_BGI/drop_dup_both_end.pl   -opre $fq  "$fq"_1.fq     "$fq"_2.fq
+  ##  "$fq"_R1.ndupB  "$fq"_R2.ndupB
+  bwa aln -t 4 $param  -f $fq.1.sai   $ref   "$fq"_R1.ndupB
+  bwa aln -t 4 $param  -f $fq.2.sai   $ref   "$fq"_R2.ndupB
+  bwa sampe -f $fq.pair.sam  $ref    $fq.1.sai   $fq.2.sai   "$fq"_R1.ndupB    "$fq"_R2.ndupB
+  samtools view -b  -S  -o $fq.pair.bam $fq.pair.sam
+  samtools sort  $fq.pair.bam  $fq.pair.sorted
+  samtools flagstat $fq.pair.sorted.bam
+  # sortBam="$sortBam  $fq.pair.sorted.bam"
+  samtools mpileup -Q 0 -q 20 -d 1000000 -f $ref   $fq.pair.sorted.bam > $fq.pileup
+  reSeqPrintSample.indel.fast.strAssign     $ref  $fq.1colum  $fq.pileup   $fq   2 2 0.3
+
+#rm  $samp.pileup
+#
+  rm   "$fq"_R1.ndupB   "$fq"_R2.ndupB  $fq.1.sai   $fq.2.sai     $fq.pair.bam   $fq.pair.sam
+  rm  $fq.pileup  "$fq"_R1.dropB  "$fq"_R2.dropB
+
+done
