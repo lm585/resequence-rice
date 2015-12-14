@@ -1,0 +1,8 @@
+
+ls | grep IRIS  | while read ll
+do
+  cd $ll
+  ls *[12].fq | sed 's/_..fq$//' | sort | uniq -d > fq-list
+  cd ..
+done
+
