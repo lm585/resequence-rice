@@ -1,5 +1,6 @@
 ###
 
+# change "aus" to "aromatic"
 param="-n 3  -o 1 -e 2 "  ## 83 bp for all cult. rice accessions
 ref="/data/linyong/rice-v7-all-chro-mito.con"
 
