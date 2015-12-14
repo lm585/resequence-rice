@@ -1,0 +1,10 @@
+
+#
+
+ls | grep IRIS |  while read ll
+do
+  cd $ll
+  sh -x ../script-pairSam-snp > out-script-pairSam-snp 2>&1
+  cd ..
+done
+
